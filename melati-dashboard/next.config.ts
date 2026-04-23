@@ -10,7 +10,7 @@ const nextConfig = {
         pathname: '/**',
       },
     ],
-    unoptimized: true, // ← ini yang paling penting
+    unoptimized: true, 
   },
   headers: async () => [
     {
