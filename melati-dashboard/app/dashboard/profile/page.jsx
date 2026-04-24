@@ -1,38 +1,114 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Template from "@/app/components/templates/template";
 import InputForm from "@/app/components/molecules/input-form";
 import Button from "@/app/components/atoms/button";
+import { toast } from "react-toastify";
 
 export default function Home() {
-  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
+    username: "",
     password: "",
-    repassword: "",
+    password_confirmation: "",
   });
-  
   const [isEdit, setIsEdit] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const fetchProfile = async () => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://192.168.3.3:8000/api/admin/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error("Gagal mengambil profil");
+
+      setFormData((prev) => ({
+        ...prev,
+        name:     data.data.name,
+        username: data.data.username,
+      }));
+    } catch (err) {
+      toast.error("Gagal mengambil data profil.");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Fungsi untuk menyimpan data
-  const handleSave = () => {
-    // Validasi repassword di sini jika perlu
-    if (formData.password !== formData.repassword) {
-      alert("Password tidak cocok!");
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSave = async () => {
+    if (formData.password && formData.password !== formData.password_confirmation) {
+      toast.error("Password tidak cocok!");
       return;
     }
-    
-    console.log("Data disimpan:", formData);
-    setIsEdit(false); // Keluar dari mode edit setelah simpan
+
+    setIsSaving(true);
+    try {
+      const token = localStorage.getItem("token");
+
+      const body = {
+        name:     formData.name,
+        username: formData.username,
+      };
+
+      // Hanya kirim password kalau diisi
+      if (formData.password) {
+        body.password              = formData.password;
+        body.password_confirmation = formData.password_confirmation;
+      }
+
+      const res = await fetch("http://192.168.3.3:8000/api/admin/profile", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error("Gagal menyimpan profil");
+
+      toast.success("Profil berhasil disimpan!");
+      setIsEdit(false);
+
+      // Reset password field
+      setFormData((prev) => ({
+        ...prev,
+        password:              "",
+        password_confirmation: "",
+      }));
+    } catch (err) {
+      toast.error("Gagal menyimpan profil.");
+      console.error(err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsEdit(false);
+    setFormData((prev) => ({
+      ...prev,
+      password:              "",
+      password_confirmation: "",
+    }));
   };
 
   return (
@@ -41,83 +117,91 @@ export default function Home() {
         <div className="m-6 p-6 bg-white rounded-lg shadow-sm border border-gray-100 max-w-2xl">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Profile</h2>
 
-          <InputForm
-            textValue="Name"
-            name="name"
-            type="text"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Enter your name"
-            className="mt-3 w-full"
-            inputClass=""
-            readOnly={!isEdit}
-          />
+          {isLoading ? (
+            <p className="text-gray-500">Loading profile...</p>
+          ) : (
+            <>
+              <InputForm
+                textValue="Name"
+                name="name"
+                type="text"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Enter your name"
+                className="mt-3 w-full"
+                inputClass=""
+                readOnly={!isEdit}
+              />
 
-          <InputForm
-            textValue="Email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Enter your email"
-            className="mt-3 w-full"
-            inputClass=""
-            readOnly={!isEdit}
-          />
-          
-          {isEdit && (
-            <div>
               <InputForm
-                textValue="Password"
-                name="password"
-                type="password"
-                value={formData.password}
+                textValue="Username"
+                name="username"
+                type="text"
+                value={formData.username}
                 onChange={handleChange}
-                placeholder="Enter your password"
+                placeholder="Enter your username"
                 className="mt-3 w-full"
                 inputClass=""
+                readOnly={!isEdit}
               />
-              <InputForm
-                textValue="Re-type password"
-                name="repassword"
-                type="password" // Diperbaiki: Tipe diubah ke password valid
-                value={formData.repassword}
-                onChange={handleChange}
-                placeholder="Re-type your password"
-                className="mt-3 w-full"
-                inputClass=""
-              />
-            </div>
+
+              {isEdit && (
+                <div>
+                  <InputForm
+                    textValue="Password baru (opsional)"
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Kosongkan jika tidak ingin ganti password"
+                    className="mt-3 w-full"
+                    inputClass=""
+                  />
+                  <InputForm
+                    textValue="Re-type password"
+                    name="password_confirmation"
+                    type="password"
+                    value={formData.password_confirmation}
+                    onChange={handleChange}
+                    placeholder="Re-type your password"
+                    className="mt-3 w-full"
+                    inputClass=""
+                  />
+                </div>
+              )}
+
+              <div className="flex gap-4 mt-8">
+                {!isEdit ? (
+                  <Button
+                    onClick={() => setIsEdit(true)}
+                    buttonStyle="blue"
+                    className="w-150 py-3"
+                  >
+                    Edit
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      onClick={handleSave}
+                      buttonStyle="white"
+                      className="w-150 py-3"
+                      disabled={isSaving}
+                    >
+                      {isSaving ? "Saving..." : "Save"}
+                    </Button>
+                    <Button
+                      onClick={handleCancel}
+                      buttonStyle="red"
+                      className="w-150 py-3"
+                      disabled={isSaving}
+                    >
+                      Cancel
+                    </Button>
+                  </>
+                )}
+              </div>
+            </>
           )}
-
-          <div className="flex gap-4 mt-8">
-            {!isEdit ? (
-              <Button
-                onClick={() => setIsEdit(true)}
-                buttonStyle="blue"
-                className="w-150 py-3"
-              >
-                Edit
-              </Button>
-            ) : (
-              <>
-                <Button
-                  onClick={handleSave}
-                  buttonStyle="white"
-                  className="w-150 py-3"
-                >
-                  Save
-                </Button>
-                <Button
-                  onClick={() => setIsEdit(false)}
-                  buttonStyle="red"
-                  className="w-150 py-3"
-                >
-                  Cancel
-                </Button>
-              </>
-            )}
-          </div>
         </div>
       </div>
     </Template>
