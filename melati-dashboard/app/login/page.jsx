@@ -32,7 +32,7 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/admin/login", {
+      const res = await fetch("http://192.168.3.3:8000/api/admin/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
