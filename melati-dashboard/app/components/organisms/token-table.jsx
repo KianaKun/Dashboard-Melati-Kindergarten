@@ -77,8 +77,8 @@ export const TokenTable = () => {
         position: "top-right",
         autoClose: 2000,
       });        
-      setPage(1);
-      }
+      loadData();     
+    }
     } catch {
       toast.error("An error occured!", {
         position: "top-right",
@@ -111,15 +111,15 @@ export const TokenTable = () => {
         position: "top-right",
         autoClose: 2000,
       });        
-        // 🔥 refresh table
-        setPage(1);
+      loadData();
       }
     } catch (err) {
       console.error(err);
       toast.error("An error occured!", {
         position: "top-right",
         autoClose: 2000,
-      });    }
+      });    
+    }
   };
 
   return (
