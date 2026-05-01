@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Pagination } from "../molecules/pagination";
+import { ToastContainer, toast } from "react-toastify";
 
 export const DeviceTable = () => {
   const [devices, setDevices] = useState([]);
@@ -65,15 +66,16 @@ export const DeviceTable = () => {
 
       if (data.success) {
         toast.success("Disconnect success!", {
-        position: "top-right",
-        autoClose: 2000,
-      });        
-      fetchDevices();
+          position: "top-right",
+          autoClose: 2000,
+        });
+        fetchDevices();
       } else {
-      toast.error("An error occured!", {
-        position: "top-right",
-        autoClose: 2000,
-      });      }
+        toast.error("An error occured!", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      }
     } catch (err) {
       console.error(err);
     }
@@ -146,6 +148,7 @@ export const DeviceTable = () => {
         perPage={perPage}
         onPageChange={setPage}
       />
+      <ToastContainer />
     </div>
   );
 };

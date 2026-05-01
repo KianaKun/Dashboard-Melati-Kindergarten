@@ -12,8 +12,9 @@ import rArrow from "@/public/r-arrow.svg";
 import lArrow from "@/public/l-arrow.svg";
 import logoutIcon from "@/public/log-out.svg";
 import { useRouter } from "next/navigation";
+import PropTypes from "prop-types";
 
-const Sidebar = () => {
+const Sidebar = ({ clickLogout }) => {
   const router = useRouter();
   const [isClosed, SetIsClosed] = useState(false);
 
@@ -27,19 +28,16 @@ const Sidebar = () => {
 
   return (
     <div
-      className={`sticky top-[8vh] py-4 bg-gray-200 px-3 h-[92vh] flex flex-col transition-all duration-300 ease-in-out ${
-        isClosed ? "w-20" : "w-64"
-      }`}
+      className={`sticky top-[8vh] py-4 bg-gray-200 px-3 h-[92vh] flex flex-col transition-all duration-300 ease-in-out ${isClosed ? "w-20" : "w-64"
+        }`}
     >
       <div
-        className={`flex items-center w-full transition-all duration-300 ${
-          isClosed ? "justify-center" : "justify-end"
-        }`}
+        className={`flex items-center w-full transition-all duration-300 ${isClosed ? "justify-center" : "justify-end"
+          }`}
       >
         <button
-          className={`shadow-black hover:shadow-sm bg-white border rounded-full w-fit cursor-pointer px-2 py-2 transition-colors duration-300 ${
-            isClosed ? "hover:bg-blue-200" : "hover:bg-green-200"
-          }`}
+          className={`shadow-black hover:shadow-sm bg-white border rounded-full w-fit cursor-pointer px-2 py-2 transition-colors duration-300 ${isClosed ? "hover:bg-blue-200" : "hover:bg-green-200"
+            }`}
           onClick={clickSide}
         >
           <Image
@@ -90,11 +88,16 @@ const Sidebar = () => {
         imageSrc={logoutIcon}
         isClosed={isClosed}
         className="mt-2"
-        onClick={() => { clickTheNav("/"); localStorage.removeItem("token")
-        }}
+        onClick={clickLogout}
       />
     </div>
   );
 };
+
+export const SidebarProps = {
+  clickLogout: PropTypes.func
+};
+
+Sidebar.propTypes = SidebarProps;
 
 export default Sidebar;

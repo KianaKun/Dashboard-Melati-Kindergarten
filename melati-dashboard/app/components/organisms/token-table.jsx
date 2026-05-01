@@ -6,7 +6,8 @@ import { StatusBadge } from "../atoms/status-badge";
 import { Pagination } from "../molecules/pagination";
 import { fetchTokensFromAPI } from "../../services/token-service";
 import { FilterPill } from "../atoms/filter-pill";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
+
 
 export const TokenTable = () => {
   const [tokens, setTokens] = useState([]);
@@ -17,29 +18,29 @@ export const TokenTable = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerate, setIsGenerate] = useState(true);
 
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
+  const loadData = async () => {
+    setIsLoading(true);
 
-      const response = await fetchTokensFromAPI({
-        page: page,
-        filter: filter,
-      });
+    const response = await fetchTokensFromAPI({
+      page: page,
+      filter: filter,
+    });
 
-      if (!response || !response.success) {
-        setTokens([]);
-        setIsLoading(false);
-        return;
-      }
-
-      setTokens(response.data.data || []);
-      setTotalData(response.data.total || 0);
-      setPerPage(response.data.per_page || 10);
-      setIsGenerate(response.data.is_generate ?? true);
-
+    if (!response || !response.success) {
+      setTokens([]);
       setIsLoading(false);
-    };
+      return;
+    }
 
+    setTokens(response.data.data || []);
+    setTotalData(response.data.total || 0);
+    setPerPage(response.data.per_page || 10);
+    setIsGenerate(response.data.is_generate ?? true);
+
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
     loadData();
   }, [page, filter]);
 
@@ -73,25 +74,23 @@ export const TokenTable = () => {
       const data = await res.json();
 
       if (data.success) {
-      toast.success("Token generated!", {
-        position: "top-right",
-        autoClose: 2000,
-      });        
-      loadData();     
-    }
+        toast.success("Token generated!", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+        loadData();
+      }
     } catch {
       toast.error("An error occured!", {
         position: "top-right",
         autoClose: 2000,
-      });   
-     }
+      });
+    }
   };
 
   const GenerateCustomToken = async () => {
     try {
       const token = localStorage.getItem("token");
-
-      const note = prompt("Masukkan keterangan token (opsional):");
 
       const res = await fetch("http://192.168.3.3:8000/api/tokens/custom", {
         method: "POST",
@@ -100,25 +99,44 @@ export const TokenTable = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          note: note || "",
+          note: "",
         }),
       });
 
       const data = await res.json();
-
       if (data.success) {
-      toast.success("Custom token generated!", {
-        position: "top-right",
-        autoClose: 2000,
-      });        
-      loadData();
+        toast.success("Custom token generated!", {
+          position: "top-right",
+          autoClose: 2000,
+        });
       }
+      loadData();
     } catch (err) {
       console.error(err);
       toast.error("An error occured!", {
         position: "top-right",
         autoClose: 2000,
-      });    
+      });
+    }
+  };
+
+  const GeneratePrintToken = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch("http://192.168.3.3:8000/api/tokens/export/pdf", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+    } catch {
+      toast.error("An error occured!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
     }
   };
 
@@ -144,6 +162,11 @@ export const TokenTable = () => {
           <FilterPill
             label="Generate Custom Token"
             onClick={GenerateCustomToken}
+          />
+
+          <FilterPill
+            label="Print Token Into PDF"
+            onClick={GeneratePrintToken}
           />
         </div>
       </div>
@@ -207,6 +230,7 @@ export const TokenTable = () => {
         perPage={perPage}
         onPageChange={setPage}
       />
+      <ToastContainer />
     </div>
   );
 };

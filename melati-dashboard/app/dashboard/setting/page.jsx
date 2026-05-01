@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Template from "@/app/components/templates/template";
 import InputForm from "@/app/components/molecules/input-form";
 import Button from "@/app/components/atoms/button";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 export default function Home() {
   const router = useRouter();
@@ -30,16 +30,16 @@ export default function Home() {
 
       const data = await res.json();
       setFormData({
-        tokenCount:    data.data.token_count,
+        tokenCount: data.data.token_count,
         tokenDuration: data.data.token_duration_hours,
         downloadSpeed: data.data.wifi_download_speed,
-        uploadSpeed:   data.data.wifi_upload_speed,
+        uploadSpeed: data.data.wifi_upload_speed,
       });
     } catch (err) {
       toast.error("Get setting data failed!", {
         position: "top-right",
         autoClose: 2000,
-      });      console.error(err);
+      }); console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -68,10 +68,10 @@ export default function Home() {
           Accept: "application/json",
         },
         body: JSON.stringify({
-          token_count:          formData.tokenCount,
+          token_count: formData.tokenCount,
           token_duration_hours: formData.tokenDuration,
-          wifi_download_speed:  formData.downloadSpeed,
-          wifi_upload_speed:    formData.uploadSpeed,
+          wifi_download_speed: formData.downloadSpeed,
+          wifi_upload_speed: formData.uploadSpeed,
         }),
       });
 
@@ -160,6 +160,7 @@ export default function Home() {
           )}
         </div>
       </div>
+      <ToastContainer />
     </Template>
   );
 }

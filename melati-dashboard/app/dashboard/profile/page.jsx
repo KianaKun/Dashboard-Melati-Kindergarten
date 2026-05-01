@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Template from "@/app/components/templates/template";
 import InputForm from "@/app/components/molecules/input-form";
 import Button from "@/app/components/atoms/button";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 export default function Home() {
   const [formData, setFormData] = useState({
@@ -31,14 +31,14 @@ export default function Home() {
 
       setFormData((prev) => ({
         ...prev,
-        name:     data.data.name,
+        name: data.data.name,
         username: data.data.username,
       }));
     } catch (err) {
       toast.error("An error occured!", {
         position: "top-right",
         autoClose: 2000,
-      });      console.error(err);
+      }); console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -66,13 +66,13 @@ export default function Home() {
       const token = localStorage.getItem("token");
 
       const body = {
-        name:     formData.name,
+        name: formData.name,
         username: formData.username,
       };
 
       // Hanya kirim password kalau diisi
       if (formData.password) {
-        body.password              = formData.password;
+        body.password = formData.password;
         body.password_confirmation = formData.password_confirmation;
       }
 
@@ -92,13 +92,13 @@ export default function Home() {
       toast.success("Profile updated!", {
         position: "top-right",
         autoClose: 2000,
-      });      
+      });
       setIsEdit(false);
 
       // Reset password field
       setFormData((prev) => ({
         ...prev,
-        password:              "",
+        password: "",
         password_confirmation: "",
       }));
     } catch (err) {
@@ -113,7 +113,7 @@ export default function Home() {
     setIsEdit(false);
     setFormData((prev) => ({
       ...prev,
-      password:              "",
+      password: "",
       password_confirmation: "",
     }));
   };
@@ -211,6 +211,7 @@ export default function Home() {
           )}
         </div>
       </div>
+      <ToastContainer />
     </Template>
   );
 }
