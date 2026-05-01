@@ -73,14 +73,18 @@ export const TokenTable = () => {
       const data = await res.json();
 
       if (data.success) {
-        toast.success("Daily Token Generated!");
-        setPage(1);
-      } else {
-        toast.error("Failed");
+      toast.success("Token generated!", {
+        position: "top-right",
+        autoClose: 2000,
+      });        
+      setPage(1);
       }
     } catch {
-      toast.error("Server error");
-    }
+      toast.error("An error occured!", {
+        position: "top-right",
+        autoClose: 2000,
+      });   
+     }
   };
 
   const GenerateCustomToken = async () => {
@@ -103,17 +107,19 @@ export const TokenTable = () => {
       const data = await res.json();
 
       if (data.success) {
-        toast.success("Custom Token Generated!");
-        
+      toast.success("Custom token generated!", {
+        position: "top-right",
+        autoClose: 2000,
+      });        
         // 🔥 refresh table
         setPage(1);
-      } else {
-        toast.error("Failed to generate custom token");
       }
     } catch (err) {
       console.error(err);
-      toast.error("Server error");
-    }
+      toast.error("An error occured!", {
+        position: "top-right",
+        autoClose: 2000,
+      });    }
   };
 
   return (

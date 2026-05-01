@@ -28,7 +28,10 @@ export const DeviceTable = () => {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        throw new Error("Gagal mengambil data device");
+        toast.error("An error occured!", {
+          position: "top-right",
+          autoClose: 2000,
+        });
       }
 
       setDevices(data.data.data);
@@ -61,11 +64,16 @@ export const DeviceTable = () => {
       const data = await res.json();
 
       if (data.success) {
-        alert("Device disconnected");
-        fetchDevices(); // refresh
+        toast.success("Disconnect success!", {
+        position: "top-right",
+        autoClose: 2000,
+      });        
+      fetchDevices();
       } else {
-        alert("Failed to disconnect");
-      }
+      toast.error("An error occured!", {
+        position: "top-right",
+        autoClose: 2000,
+      });      }
     } catch (err) {
       console.error(err);
     }

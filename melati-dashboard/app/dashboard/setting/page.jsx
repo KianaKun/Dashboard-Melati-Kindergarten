@@ -29,9 +29,6 @@ export default function Home() {
       });
 
       const data = await res.json();
-
-      if (!res.ok || !data.success) throw new Error("Gagal mengambil settings");
-
       setFormData({
         tokenCount:    data.data.token_count,
         tokenDuration: data.data.token_duration_hours,
@@ -39,8 +36,10 @@ export default function Home() {
         uploadSpeed:   data.data.wifi_upload_speed,
       });
     } catch (err) {
-      toast.error("Gagal mengambil data settings.");
-      console.error(err);
+      toast.error("Get setting data failed!", {
+        position: "top-right",
+        autoClose: 2000,
+      });      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -80,9 +79,15 @@ export default function Home() {
 
       if (!res.ok || !data.success) throw new Error("Gagal menyimpan settings");
 
-      toast.success("Settings berhasil disimpan!");
+      toast.success("Setting saved successfully!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
     } catch (err) {
-      toast.error("Gagal menyimpan settings.");
+      toast.error("Setting saved failed!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
       console.error(err);
     } finally {
       setIsSaving(false);

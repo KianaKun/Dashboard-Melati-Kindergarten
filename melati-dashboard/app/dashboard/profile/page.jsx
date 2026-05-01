@@ -28,7 +28,6 @@ export default function Home() {
       });
 
       const data = await res.json();
-      if (!res.ok || !data.success) throw new Error("Gagal mengambil profil");
 
       setFormData((prev) => ({
         ...prev,
@@ -36,8 +35,10 @@ export default function Home() {
         username: data.data.username,
       }));
     } catch (err) {
-      toast.error("Gagal mengambil data profil.");
-      console.error(err);
+      toast.error("An error occured!", {
+        position: "top-right",
+        autoClose: 2000,
+      });      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +54,10 @@ export default function Home() {
 
   const handleSave = async () => {
     if (formData.password && formData.password !== formData.password_confirmation) {
-      toast.error("Password tidak cocok!");
+      toast.error("Password is not match!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
       return;
     }
 
@@ -85,7 +89,10 @@ export default function Home() {
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error("Gagal menyimpan profil");
 
-      toast.success("Profil berhasil disimpan!");
+      toast.success("Profile updated!", {
+        position: "top-right",
+        autoClose: 2000,
+      });      
       setIsEdit(false);
 
       // Reset password field
