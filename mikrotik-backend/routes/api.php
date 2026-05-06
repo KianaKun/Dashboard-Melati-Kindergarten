@@ -15,11 +15,11 @@ Route::post('/user/login',  [UserAuthController::class, 'login']);
 
 // endpoint login user WiFi (captive portal)
 Route::post('/captive/login', [TokenController::class, 'login']);
-// endpoint khusus OS (WAJIB)
+// endpoint api for System Operation
 Route::get('/generate_204', [CaptiveController::class, 'androidCheck']);
 Route::get('/hotspot-detect.html', [CaptiveController::class, 'appleCheck']);
 
-// ── Admin (butuh token Sanctum) ───────────────────────────
+// Admin API
 Route::middleware('auth:sanctum')->group(function () {
 
     // Auth

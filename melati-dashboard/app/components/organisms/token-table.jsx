@@ -124,15 +124,36 @@ export const TokenTable = () => {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await fetch("http://192.168.3.3:8000/api/tokens/export/pdf", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        "http://192.168.3.3:8000/api/tokens/export/pdf",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      const data = await res.json();
-    } catch {
+      if (!res.ok) {
+        throw new Error("Failed to generate PDF");
+      }
+
+      const blob = await res.blob();
+
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "tokens.pdf";
+
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+
       toast.error("An error occured!", {
         position: "top-right",
         autoClose: 2000,
