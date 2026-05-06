@@ -151,6 +151,10 @@ export const TokenTable = () => {
       a.remove();
 
       window.URL.revokeObjectURL(url);
+      toast.success("PDF generated successfully!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
     } catch (err) {
       console.error(err);
 

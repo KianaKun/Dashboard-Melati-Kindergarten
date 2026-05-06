@@ -3,9 +3,13 @@ export const fetchTokensFromAPI = async ({ page = 1, filter = "ALL" }) => {
     const token = localStorage.getItem("token");
 
     let status = "";
+
     if (filter === "ACTIVE") status = "active";
     if (filter === "USED") status = "used";
     if (filter === "EXPIRED") status = "expired";
+
+    if (filter === "CUSTOM") status = "custom";
+    if (filter === "SYSTEM") status = "system";
 
     const url = `http://192.168.3.3:8000/api/tokens?page=${page}${status ? `&status=${status}` : ""}`;
 

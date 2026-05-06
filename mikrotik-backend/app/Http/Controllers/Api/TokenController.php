@@ -21,12 +21,14 @@ class TokenController extends Controller
     {
         $query = Token::latest();
 
-        $status = $request->query('status');
+        $status = strtolower($request->query('status',''));
 
         match ($status) {
             'active'  => $query->active(),
             'used'    => $query->used(),
             'expired' => $query->expired(),
+            'custom'  => $query->where('is_custom', true),
+            'system'  => $query->where('is_custom', false),
             default   => null,
         };
 
@@ -64,16 +66,12 @@ class TokenController extends Controller
             ], 401);
         }
 
-        // tandai token dipakai
         $token->update([
             'is_used' => true,
             'used_at' => now()
         ]);
 
-        // ambil IP client
         $ip = $request->ip();
-
-        // inject ke MikroTik
         $ok = $this->mikrotikService->addToAddressList($ip, $token->valid_until);
 
         if (!$ok) {
@@ -83,7 +81,6 @@ class TokenController extends Controller
             ], 500);
         }
 
-        // ❗ penting: jangan redirect
         return response()->json([
             'success' => true,
             'message' => 'Login berhasil',
@@ -94,8 +91,9 @@ class TokenController extends Controller
 
     public function generate(): JsonResponse
     {
+        Token::where('valid_until', '<', now())->delete();
+
         $tokens = $this->tokenService->generateDailyTokens();
-        // $this->mikrotikService->syncTokens($tokens);
 
         return response()->json([
             'success' => true,
@@ -106,11 +104,9 @@ class TokenController extends Controller
             ],
         ]);
     }
-
     public function addCustom(): JsonResponse
     {
         $token = $this->tokenService->generateCustomToken('');
-        // $this->mikrotikService->addHotspotUser($token->code, $token->valid_until->toDateTimeString());
 
         return response()->json([
             'success' => true,
@@ -128,7 +124,6 @@ class TokenController extends Controller
             ], 422);
         }
 
-        // $this->mikrotikService->removeHotspotUser($token->code);
         $token->delete();
 
         return response()->json([
