@@ -155,6 +155,13 @@ export const TokenTable = () => {
         position: "top-right",
         autoClose: 2000,
       });
+
+      setTimeout(() => {
+        a.click();
+        a.remove();
+
+        window.URL.revokeObjectURL(url);
+      }, 300);
     } catch (err) {
       console.error(err);
 
